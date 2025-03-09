@@ -1,40 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { Container, Card, Alert, Button } from "react-bootstrap";
-import { FaUser, FaWeightHanging, FaRoad, FaCity, FaGlobeAmericas } from "react-icons/fa";
-import { TbWorldLongitude, TbWorldLatitude } from "react-icons/tb";
-import { GoNumber } from "react-icons/go";
+import React, { useState, useEffect } from "react"; // Importa React e hooks
+import { Container, Card, Alert, Button } from "react-bootstrap"; // Importa componentes do React-Bootstrap
+import { FaUser, FaWeightHanging, FaRoad, FaCity, FaGlobeAmericas } from "react-icons/fa"; // Importa ícones
+import { TbWorldLongitude, TbWorldLatitude } from "react-icons/tb"; // Importa ícones de longitude e latitude
+import { GoNumber } from "react-icons/go"; // Importa ícone de número
 import { useParams } from "react-router-dom"; // Para pegar o ID da URL
-import { useNavigate } from "react-router-dom"; // Importando useNavigate
-import { FaHouseChimney } from "react-icons/fa6";
-import EnderecoLookup from "../components/EnderecoLookup"; 
+import { useNavigate } from "react-router-dom"; // Importando useNavigate para navegação
+import { FaHouseChimney } from "react-icons/fa6"; // Importa ícone de casa
+import EnderecoLookup from "../components/EnderecoLookup"; // Importa componente de busca de endereço
 
 
 function UpdateDelivery() {
-    const [error] = useState(null); 
-    const { id } = useParams(); // Pega o ID da URL
-    const [enderecoInput, setEnderecoInput] = useState ("");
-    const [formData, setFormData] = useState({
-    nomeCliente: "",
-    peso: 0.0,
-    logradouro: "",
-    numero: "",
-    bairro: "",
-    complemento: "",
-    cidade: "",
-    estado: "",
-    pais: "",
-    latitude: "",
-    longitude: ""
+  const [error] = useState(null); // Estado para gerenciar erros
+  const { id } = useParams(); // Pega o ID da URL
+  const [enderecoInput, setEnderecoInput] = useState(""); // Estado para gerenciar input de endereço
+  const [formData, setFormData] = useState({ // Estado para gerenciar os dados do formulário
+      nomeCliente: "",
+      peso: 0.0,
+      logradouro: "",
+      numero: "",
+      bairro: "",
+      complemento: "",
+      cidade: "",
+      estado: "",
+      pais: "",
+      latitude: "",
+      longitude: ""
   });
-
-
-  const [endereco, setEndereco] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [cidade, setCidade] = useState("");
-  const [estado, setEstado] = useState("");
-  const [pais, setPais] = useState("");
-
 
   useEffect(() => {
     // Buscar os dados da entrega pelo ID
@@ -47,56 +38,55 @@ function UpdateDelivery() {
          },
         });
         if (!response.ok) {
-          throw new Error("Erro ao carregar dados da entrega");
+          throw new Error("Erro ao carregar dados da entrega"); // Lança erro se a resposta não for ok
         }
-        const data = await response.json();
-        setFormData(data);
-      } catch (error) {
-        console.error(error.message);
+        const data = await response.json(); // Converte a resposta em JSON
+                setFormData(data); // Atualiza o estado com os dados da entrega
+            } catch (error) {
+                console.error(error.message); // Loga erro no console
       }
     }
-    fetchDelivery();
+    fetchDelivery(); // Chama a função para buscar os dados
   },[id]);
   
-  const navigate = useNavigate();
-
-  const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // Hook para navegação
+  const [message, setMessage] = useState(""); // Estado para mensagens
 
   const handleChange = (e, isNumber = false) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target; // Desestrutura o evento para pegar o nome e valor
     setFormData({
-      ...formData,
-      [name]: isNumber ? value !== "" ? parseFloat(value) : "" : value,
+        ...formData,
+        [name]: isNumber ? value !== "" ? parseFloat(value) : "" : value, // Atualiza o estado com o novo valor
     });
-  };
+};
 
-  const handleUpdate = async (e) => {
-   // e.preventDefault();
-   // setMessage("");
+const handleUpdate = async (e) => {
+  // e.preventDefault(); // Previne o comportamento padrão do formulário
+  // setMessage(""); // Limpa a mensagem anterior
 
-    try {
-      formData.latitude = String(formData.latitude)
-      formData.longitude = String(formData.longitude)
-      const response = await fetch(`http://localhost:8080/deliveries/update/${id}`, {
+  try {
+    formData.latitude = String(formData.latitude) // Converte latitude para string
+    formData.longitude = String(formData.longitude) // Converte longitude para string
+    const response = await fetch(`http://localhost:8080/deliveries/update/${id}`, { // Faz a requisição para atualizar a entrega
         method: "PUT",
-        headers: { 
-          "Content-Type": "application/json"
-         },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar a entrega");
-      }
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData), // Converte os dados do formulário em JSON
+    });
+    if (!response.ok) {
+      throw new Error("Erro ao atualizar a entrega"); // Lança erro se a resposta não for ok
+  }
 
-      alert("Entrega atualizada com sucesso!");
+  alert("Entrega atualizada com sucesso!"); // Exibe mensagem de sucesso
+  navigate("/"); // Volta para a Home após a atualização
 
-      navigate("/"); // Volta para a Home após a atualização
 
     
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+} catch (error) {
+  alert(error.message); // Exibe mensagem de erro
+}
+};
 
   return (
     <Container className="mt-4">
@@ -154,4 +144,4 @@ function UpdateDelivery() {
   );
 }
 
-export default UpdateDelivery;
+export default UpdateDelivery; // Exporta o componente UpdateDelivery

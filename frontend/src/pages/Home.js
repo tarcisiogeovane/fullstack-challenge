@@ -1,80 +1,90 @@
-import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Alert, Spinner, Button } from "react-bootstrap"; // Adicionando Button aqui
-import { FaAddressCard, FaCity, FaAddressBook, FaRoad, FaUser, FaWeightHanging, FaGlobeAmericas } from "react-icons/fa";
-import { GoNumber } from "react-icons/go";
-import { TbWorldLongitude, TbWorldLatitude } from "react-icons/tb";
-import { useNavigate } from "react-router-dom"; // Importando useNavigate
-import { FaHouseChimney } from "react-icons/fa6";
+import React, { useEffect, useState } from "react"; // Importa React e hooks useEffect e useState
+import { Container, Row, Col, Card, Alert, Spinner, Button } from "react-bootstrap"; // Importa componentes do React-Bootstrap
+import { FaAddressCard, FaCity, FaAddressBook, FaUser, FaWeightHanging, FaGlobeAmericas } from "react-icons/fa"; // Importa ícones
+import { GoNumber } from "react-icons/go"; // Importa ícone de número
+import { TbWorldLongitude, TbWorldLatitude } from "react-icons/tb"; // Importa ícones de latitude e longitude
+import { useNavigate } from "react-router-dom"; // Importa o hook useNavigate para redirecionamento
+import { FaHouseChimney } from "react-icons/fa6"; // Importa ícone de casa
   
 
 function Home() {
-  const [deliveries, setDeliveries] = useState([]); // Garante que seja um array vazio no início
-  const [error, setError] = useState(null); 
-  const [loading, setLoading] = useState(true); 
-  const navigate = useNavigate(); // Inicializando useNavigate
+  // Declara estados para armazenar entregas, erros e status de carregamento
+  const [deliveries, setDeliveries] = useState([]); // Inicia como um array vazio
+  const [error, setError] = useState(null); // Inicia sem erros
+  const [loading, setLoading] = useState(true); // Inicia como carregando
+  const navigate = useNavigate(); // Inicializa o hook useNavigate
 
+  // useEffect para buscar as entregas quando o componente é montado
   useEffect(() => {
     const fetchDeliveries = async () => {
       try {
+        // Faz a requisição para buscar as entregas
         const response = await fetch("http://localhost:8080/deliveries", {
           method: "GET",
           mode: "cors",
         });
+
+        // Verifica se a resposta da API é bem-sucedida
         if (!response.ok) {
           throw new Error("Erro ao buscar entregas");
         }
-        const data = await response.json();
-        setDeliveries(data || []); // Garante que 'data' seja um array
+        const data = await response.json(); // Converte a resposta para JSON
+        setDeliveries(data || []); // Atualiza o estado com os dados recebidos
       } catch (error) {
-        setError(error.message);
+        setError(error.message); // Atualiza o estado de erro
         setDeliveries([]); // Garante que deliveries SEMPRE seja um array
       } finally {
-        setLoading(false);
+        setLoading(false); // Atualiza o estado de carregamento para falso
       }
     };
 
-    fetchDeliveries();
-  }, []);
+    fetchDeliveries(); // Chama a função para buscar as entregas
+  }, []); // Dependência vazia, executa apenas uma vez ao montar o componente
 
-  const handleCreate = () => {
-    navigate("/create"); // Redireciona para a página de criação de entrega
+
+   // Função para redirecionar para a página de criação de entrega
+   const handleCreate = () => {
+    navigate("/create"); // Redireciona para a rota de criação
   };
 
   // Função para excluir uma entrega
   const handleDelete = async (id) => {
     if (window.confirm("Você tem certeza que deseja excluir esta entrega?")) {
       try {
+        // Faz a requisição para excluir a entrega
         const response = await fetch(`http://localhost:8080/deliveries/delete`, {
           method: "DELETE",
           mode: "cors",
-          headers: {"Content-type": "application/jason",},        
-          body: JSON.stringify({id}), // passar o id no corpo da requisição
+          headers: { "Content-type": "application/json" }, // Corrigido para "application/json"
+          body: JSON.stringify({ id }), // Envia o id no corpo da requisição
         });
+        // Verifica se a resposta da API é bem-sucedida
         if (!response.ok) {
           throw new Error("Erro ao excluir a entrega");
         }
         // Atualiza a lista de entregas após a exclusão
         setDeliveries((prevDeliveries) => prevDeliveries.filter((delivery) => delivery.id !== id));
       } catch (error) {
-        setError(error.message);
+        setError(error.message); // Atualiza o estado de erro em caso de falha
       }
     }
   };
 
-  // Função para editar uma entrega
-  const handleUpdate = (id) => {
-    // Implementar lógica de edição, por exemplo, redirecionar para um formulário de edição
+   // Função para editar uma entrega
+   const handleUpdate = (id) => {
+    // Redireciona para a página de edição da entrega
     navigate(`/update/${id}`);
   };
+
 
   return (
     <Container className="mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1 style={{ fontWeight: "bold", color: "#007bff" }}>📦 Lista de Entregas</h1>
-        <Button variant="success" onClick={handleCreate}>➕ Criar Entrega</Button>
+        <Button variant="success" onClick={handleCreate}>➕ Criar Entrega</Button> {/* Botão para criar entrega */}
       </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>} {/* Exibe mensagem de erro, se houver */}
 
       {loading && (
         <div className="text-center">
@@ -89,14 +99,14 @@ function Home() {
               <Card
                 className="shadow-sm"
                 style={{
-                  borderRadius: "15px",
-                  transition: "0.3s",
-                  cursor: "pointer",
-                  border: "none",
-                  background: "#f8f9fa",
+                  borderRadius: "15px", // Bordas arredondadas
+                  transition: "0.3s", // Transição suave ao passar o mouse
+                  cursor: "pointer", // Cursor de ponteiro ao passar o mouse
+                  border: "none", // Sem borda
+                  background: "#f8f9fa", // Cor de fundo
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")} // Efeito de zoom ao passar o mouse
+                onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")} // Retorna ao tamanho original
               >
                 <Card.Body>
                   <h5 style={{ display: "flex", alignItems: "center", gap: "8px", color: "#343a40" }}>
@@ -135,14 +145,14 @@ function Home() {
                   {/* Botões de ação */}
                     <div>
                       <Button
-                        onClick={() => handleUpdate(delivery.id)}
-                        style={{ minWidth: "50px", padding: "10px 16px", textAlign: "center" }}
+                      onClick={() => handleUpdate(delivery.id)} // Chama a função de atualização
+                      style={{ minWidth: "50px", padding: "10px 16px", textAlign: "center" }}
                       >
                         Editar
                       </Button>
                       <Button
                         variant="danger"
-                        onClick={() => handleDelete(delivery.id)}
+                        onClick={() => handleDelete(delivery.id)} // Chama a função de exclusão
                         style={{ minWidth: "50px", padding: "10px 16px", textAlign: "center", marginLeft: "10px" }}
                       >
                         Excluir
@@ -153,6 +163,7 @@ function Home() {
             </Col>
           ))
         ) : (
+          // Caso não haja entregas, exibe uma mensagem
           !loading && <p className="text-center">Nenhuma entrega encontrada.</p>
         )}
       </Row>
@@ -160,4 +171,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Home; // Exporta o componente

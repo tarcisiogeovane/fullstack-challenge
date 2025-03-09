@@ -1,16 +1,18 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Alert, Spinner, Button } from "react-bootstrap"; // Adicionando Button aqui
-import { FaAddressCard, FaCity, FaAddressBook, FaRoad, FaUser, FaWeightHanging, FaGlobeAmericas} from "react-icons/fa";
+import { Container, Card, Alert, Button } from "react-bootstrap"; // Importação de componentes do Bootstrap para estilização
+import { FaAddressCard, FaCity, FaAddressBook, FaRoad, FaUser, FaWeightHanging, FaGlobeAmericas } from "react-icons/fa"; // Ícones para melhorar a UI
 import { TbWorldLongitude, TbWorldLatitude } from "react-icons/tb";
 import { GoNumber } from "react-icons/go";
 import { useNavigate } from "react-router-dom"; // Importando o hook de navegação
 import { FaHouseChimney } from "react-icons/fa6";
-import EnderecoLookup from "../components/EnderecoLookup";
+import EnderecoLookup from "../components/EnderecoLookup"; // Componente para busca de endereços
 
 
 function CreateDelivery() {
   const navigate = useNavigate(); // Hook para navegação
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);  // Estado para armazenar erros
+
+    // Estado do formulário para armazenar os dados da entrega
   const [formData, setFormData] = useState({
     nomeCliente: "",
     peso: 0.0,
@@ -24,16 +26,18 @@ function CreateDelivery() {
     latitude: "",
     longitude: ""
   });
-  const [message, setMessage] = useState("");
+
+  const [message, setMessage] = useState(""); // Estado para exibir mensagens de sucesso ou erro
   
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value ? parseFloat(value) : 0.0, // Converte para número apenas se isNumber for true
+      [name]: value ? parseFloat(value) : 0.0, // Converte para número caso tenha valor
     });
   };
 
+    // Função para tratar mudanças nos campos de texto do formulário
   const handleChangeString = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -42,17 +46,20 @@ function CreateDelivery() {
     }));
   };
 
+  // Função para enviar os dados da entrega para o servidor
   const handleCreate = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Evita o comportamento padrão do formulário
     setMessage("");
 
     try {
+      // Garante que latitude e longitude sejam strings
       formData.latitude = String(formData.latitude)
       formData.longitude = String(formData.longitude)
+
       const response = await fetch("http://localhost:8080/deliveries/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData), // Converte os dados para JSON
       });
 
       if (!response.ok) {
@@ -60,6 +67,7 @@ function CreateDelivery() {
       }
 
       setMessage("Entrega criada com sucesso!");
+      // Reseta os campos do formulário
       setFormData({ 
         nomeCliente: "",
         peso: 0.0,
@@ -85,7 +93,7 @@ function CreateDelivery() {
         📦 Cadastro de Entregas
       </h1>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>} {/* Exibe erros, se houver */}
       <Card
         className="shadow-sm"
         style={{
@@ -95,6 +103,7 @@ function CreateDelivery() {
           background: "#f8f9fa",
         }}
         
+          // Campos do formulário
       >
         <Card.Body>
           <p style={{ display: "flex", alignItems: "center", gap: "8px", color: "#343a40" }}>
